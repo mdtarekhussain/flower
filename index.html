@@ -1,43 +1,555 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=
-  , initial-scale=1.0"
-    />
-    <title>wish card</title>
-    <link rel="stylesheet" href="styling.css" />
-  </head>
-  <body>
-    <div>
-      <div>
-        <div
-          class="tenor-gif-embed"
-          data-postid="17076762"
-          data-share-method="host"
-          data-aspect-ratio="1.22605"
-          data-width="100%"
-        >
-          <a
-            href="https://tenor.com/view/happy-birthday-cake-happy-celebrate-b-day-gif-17076762"
-            >Happy Birthday Cake Sticker</a
-          >from
-          <a href="https://tenor.com/search/happy+birthday-stickers"
-            >Happy Birthday Stickers</a
-          >
-        </div>
-        <script
-          type="text/javascript"
-          async
-          src="https://tenor.com/embed.js"
-        ></script>
-      </div>
-      <div>
-        <h2>HAPPY BIRTHDAY TO YOU!!!💕🎂</h2>
-        <a class="Next" href="next1.html">Next</a>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Wish Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      overflow: hidden;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .card-container {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 30px 20px;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+
+    .card-header:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background: linear-gradient(90deg, #f093fb, #f5576c, #f093fb);
+      background-size: 200% 100%;
+      animation: gradient 3s ease infinite;
+    }
+
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .card-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .card-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .card-body {
+      padding: 30px 20px;
+      text-align: center;
+      /* কার্ড বডির ভিতরে গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড */
+      background: linear-gradient(135deg, #ffeef8 0%, #fff0f5 50%, #ffe6f2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #text-display {
+      font-size: 22px;
+      line-height: 1.6;
+      /* টেক্সটের জন্য রোমান্টিক রঙ */
+      color: #d63384;
+      margin-bottom: 30px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+      /* টেক্সটকে মাঝখানে নিয়ে আসার জন্য */
+      text-align: center;
+    }
+
+    #emoji-container {
+      margin: 20px 0;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #emoji {
+      font-size: 0px;
+    }
+
+    .grow-emoji {
+      animation: grow 2s ease forwards;
+    }
+
+    @keyframes grow {
+      0% { 
+        font-size: 0px; 
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      50% { 
+        font-size: 60px; 
+        opacity: 1;
+        transform: scale(1.2);
+      }
+      100% { 
+        font-size: 80px; 
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .break-emoji {
+      animation: break 1.5s ease forwards;
+    }
+
+    @keyframes break {
+      0% { 
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      50% { 
+        transform: scale(1.3) rotate(5deg);
+        opacity: 0.8;
+      }
+      100% { 
+        transform: scale(0) rotate(15deg);
+        opacity: 0;
+      }
+    }
+
+    .particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #d63384;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    @keyframes particle-animation {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--x), var(--y)) scale(0);
+        opacity: 0;
+      }
+    }
+
+    .action-button {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #d63384, #ff6b9d);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(214, 51, 132, 0.3);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-button:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+
+    .action-button:hover:before {
+      transform: translateX(0);
+    }
+
+    .action-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 20px rgba(214, 51, 132, 0.4);
+    }
+
+    .action-button.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .heart-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    .heart-bg:before, .heart-bg:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 52px;
+      height: 80px;
+      background: #d63384;
+      border-radius: 50px 50px 0 0;
+      transform: rotate(-45deg);
+      transform-origin: 0 100%;
+    }
+
+    .heart-bg:after {
+      left: 0;
+      transform: rotate(45deg);
+      transform-origin: 100% 100%;
+    }
+
+    .heart-bg:before {
+      left: 50px;
+    }
+
+    /* মোবাইল রেসপন্সিভ ডিজাইন */
+    @media (max-width: 480px) {
+      .card-container {
+        max-width: 100%;
+        border-radius: 15px;
+      }
+      
+      .card-header {
+        padding: 20px 15px;
+      }
+      
+      .card-header h1 {
+        font-size: 24px;
+      }
+      
+      .card-body {
+        padding: 20px 15px;
+      }
+      
+      #text-display {
+        font-size: 20px;
+        min-height: 100px;
+      }
+      
+      .action-button {
+        padding: 12px 24px;
+        font-size: 16px;
+      }
+    }
+
+    /* ব্যাকগ্রাউন্ড অ্যানিমেশন */
+    .floating-hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .floating-heart {
+      position: absolute;
+      bottom: -50px;
+      color: rgba(214, 51, 132, 0.7);
+      font-size: 20px;
+      animation: float-up 10s linear infinite;
+    }
+
+    @keyframes float-up {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* স্পার্কল ইফেক্ট */
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 5;
+      animation: sparkle 1.5s linear infinite;
+    }
+
+    @keyframes sparkle {
+      0% {
+        opacity: 0;
+        transform: scale(0);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ফ্লোটিং হার্ট ব্যাকগ্রাউন্ড -->
+  <div class="floating-hearts">
+    <div class="floating-heart" style="left: 10%; animation-delay: 0s;">❤️</div>
+    <div class="floating-heart" style="left: 20%; animation-delay: 2s;">💖</div>
+    <div class="floating-heart" style="left: 30%; animation-delay: 5s;">💕</div>
+    <div class="floating-heart" style="left: 40%; animation-delay: 7s;">💗</div>
+    <div class="floating-heart" style="left: 50%; animation-delay: 1s;">💓</div>
+    <div class="floating-heart" style="left: 60%; animation-delay: 3s;">💞</div>
+    <div class="floating-heart" style="left: 70%; animation-delay: 6s;">💘</div>
+    <div class="floating-heart" style="left: 80%; animation-delay: 8s;">💝</div>
+    <div class="floating-heart" style="left: 90%; animation-delay: 4s;">💟</div>
+  </div>
+
+  <!-- কার্ড কন্টেইনার -->
+  <div class="card-container">
+    <!-- হার্ট ব্যাকগ্রাউন্ড -->
+    <div class="heart-bg"></div>
+    
+    <!-- কার্ড হেডার -->
+    <div class="card-header">
+      <h1>Hello Salma</h1>
+      <p>A special message for you</p>
     </div>
-  </body>
+    
+    <!-- কার্ড বডি -->
+    <div class="card-body">
+      <div id="text-display"></div>
+      <div id="emoji-container">
+        <span id="emoji">🤔</span>
+      </div>
+      <a href="next2.html" style="color: white; text-decoration: none;"><button id="action-button" class="action-button">Click Here </button></a>
+    </div>
+  </div>
+
+  <!-- স্পার্কল ইফেক্ট -->
+  <script>
+    // স্পার্কল তৈরি করার ফাংশন
+    function createSparkles() {
+      const container = document.querySelector('.card-container');
+      
+      for (let i = 0; i < 15; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.classList.add('sparkle');
+        
+        // র্যান্ডম পজিশন
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        
+        sparkle.style.left = `${x}%`;
+        sparkle.style.top = `${y}%`;
+        sparkle.style.animationDelay = `${Math.random() * 2}s`;
+        
+        container.appendChild(sparkle);
+      }
+    }
+    
+    // পেজ লোড হলে স্পার্কল তৈরি করুন
+    window.addEventListener('load', createSparkles);
+  </script>
+
+  <script>
+    const emoji = document.getElementById('emoji');
+    const emojiContainer = document.getElementById('emoji-container');
+    const actionButton = document.getElementById('action-button');
+    const textDisplay = document.getElementById('text-display');
+
+    // টেক্সটের জন্য বিভিন্ন রোমান্টিক রঙ
+    const textColors = [
+      '#d63384', // গোলাপি
+      '#e83e8c', // গোলাপি-বেগুনি
+      '#ff6b9d', // গোলাপি-লাল
+      '#ff8fab', // গোলাপি-লাল
+      '#ff6b6b', // লাল
+      '#ff8787', // লাল-গোলাপি
+      '#ff9ff3', // গোলাপি-হালকা
+      '#f368e0', // গোলাপি
+      '#ee5a6f', // গোলাপি-লাল
+      '#ff6348', // টমেটো লাল
+      '#ff1744', // লাল
+      '#e91e63', // গোলাপি
+      '#ad1457', // গাঢ় গোলাপি
+      '#880e4f'  // খুব গাঢ় গোলাপি
+    ];
+
+    function typeWriterEffect(text, elementId, speed, callback) {
+      const element = document.getElementById(elementId);
+      element.textContent = '';
+      let i = 0;
+
+      function typing() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(typing, speed);
+        } else if (callback) {
+          callback();
+        }
+      }
+
+      typing();
+    }
+
+    function createParticles(x, y, count = 15) {
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 50 + Math.random() * 100;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+
+        particle.style.setProperty('--x', `${tx}px`);
+        particle.style.setProperty('--y', `${ty}px`);
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        particle.style.animation = `particle-animation 0.8s ease-out forwards`;
+
+        document.body.appendChild(particle);
+
+        setTimeout(() => {
+          particle.remove();
+        }, 800);
+      }
+    }
+
+    // টেক্সটের রং পরিবর্তন করার ফাংশন
+    function changeTextColor() {
+      const randomColor = textColors[Math.floor(Math.random() * textColors.length)];
+      textDisplay.style.color = randomColor;
+    }
+
+    window.onload = function () {
+      typeWriterEffect('Hello', 'text-display', 100, function () {
+        // প্রথম টেক্সটের পরে রং পরিবর্তন
+        changeTextColor();
+        
+        setTimeout(() => {
+          typeWriterEffect('How are you today?', 'text-display', 100, function () {
+            // দ্বিতীয় টেক্সটের পরে রং পরিবর্তন
+            changeTextColor();
+            
+            setTimeout(() => {
+              typeWriterEffect('Do you know what today is?', 'text-display', 100, function () {
+                // তৃতীয় টেক্সটের পরে রং পরিবর্তন
+                changeTextColor();
+                
+                setTimeout(() => {
+                  typeWriterEffect('Okay, let me tell you...', 'text-display', 100, function () {
+                    // চতুর্থ টেক্সটের পরে রং পরিবর্তন
+                    changeTextColor();
+                    
+                    emojiContainer.style.opacity = 1;
+                    emoji.classList.add('grow-emoji');
+
+                    setTimeout(() => {
+                      emoji.classList.remove('grow-emoji');
+                      emoji.classList.add('break-emoji');
+
+                      const rect = emojiContainer.getBoundingClientRect();
+                      const x = rect.left + rect.width / 2;
+                      const y = rect.top + rect.height / 2;
+                      createParticles(x, y);
+
+                      setTimeout(() => {
+                        typeWriterEffect('This is a very important day for you ❤‍🩹', 'text-display', 100, function() {
+                          // পঞ্চম টেক্সটের পরে রং পরিবর্তন
+                          changeTextColor();
+                          
+                          setTimeout(() => {
+                            typeWriterEffect('what\'s?', 'text-display', 100, function() {
+                              // ষষ্ঠ টেক্সটের পরে রং পরিবর্তন
+                              changeTextColor();
+                              
+                              setTimeout(() => {
+                                actionButton.classList.add('show');
+                              }, 1000);
+                            });
+                          }, 2000);
+                        });
+                      }, 1500);
+
+                    }, 2500);
+
+                  });
+                }, 1000);
+              });
+            }, 1000);
+          });
+        }, 1000);
+      });
+    };
+  </script>
+</body>
 </html>

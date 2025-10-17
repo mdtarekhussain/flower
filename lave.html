@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swinging 3D Heart Animation with Slow Letter Animation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        
+    
+        #text-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff69b4;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4, 0 0 30px #ff69b4;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+          
+            transition: transform 0.1s linear;
+           
+            text-transform: uppercase;
+        }
+        
+ 
+        .letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: letterAppear 0.8s ease-out forwards;
+        }
+        
+        @keyframes letterAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+   
+        #button-container {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 20;
+            gap: 20px;
+        }
+       
+        .control-button {
+            padding: 12px 24px;
+            background-color: rgba(255, 105, 180, 0.7);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .control-button:hover {
+            background-color: rgba(255, 105, 180, 0.9);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="text-display"></div>
+    
+   
+    <div id="button-container">
+        <button id="end-button" class="control-button"><a href="flower/flower.html">END</a></button>
+        <button id="replay-button" class="control-button">REPLAY</button>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        
+        const scene = new THREE.Scene();
+        
+     
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
+        camera.position.z = 30;
+        
+       
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000);
+        document.body.appendChild(renderer.domElement);
+        
+     
+        const particlesCount = 10000; 
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        
+        function heartShape(t) {
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+            return { 
+                x: x * 0.6,    
+                y: y * 0.7,    
+                z: (Math.random() - 0.5) * 6 
+            }; 
+        }
+        
+    
+        for (let i = 0; i < particlesCount; i++) {
+            const t = Math.random() * Math.PI * 2;
+            const heart = heartShape(t);
+            
+            positions[i * 3] = heart.x;
+            positions[i * 3 + 1] = heart.y;
+            positions[i * 3 + 2] = heart.z;
+            
+        
+            colors[i * 3] = 1.0; 
+            colors[i * 3 + 1] = 0.4; 
+            colors[i * 3 + 2] = 0.7; 
+        }
+        
+ 
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.15,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending 
+        });
+  
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+        
+   
+        const pulseSpeed = 0.001; 
+        const swingSpeed = 0.0005; 
+        const swingRange = 0.1;
+
+      
+        const textDisplay = document.getElementById('text-display');
+        const buttonContainer = document.getElementById('button-container');
+        const endButton = document.getElementById('end-button');
+        const replayButton = document.getElementById('replay-button');
+        
+ 
+        const texts = [
+            'HAPPY',
+            'BIRTHDAY',
+            'TO YOU',
+            'SALMA',
+            'WISHING',
+            'YOU',
+            'ALL',
+            'THE',
+            'HAPPINESS',
+            'LOVE',
+            'AND',
+            'SMILES',
+            'THE WORLD',
+            'MAY YOUR',
+            'DAY BE',
+            'THE MOST',
+            'BEAUTIFUL',
+            'ALL THE',
+            'JOY',
+            'IS ONLY',
+            'FOR YOU',
+            'MAY YOU',
+            'ALWAYS KEEP',
+            'SMILING',
+            'MAY YOUR ',
+            'LIFE',
+            'BE FULL',
+            'OF LIGHT',
+            'MAY YOUR',
+            'DREAMS',
+            'COME TRUE'
+        ];
+        
+        let currentTextIndex = 0;
+        let textChangeTimer;
+        let letterTimer;
+        let animationCompleted = false;
+        
+  
+        function displayTextLetterByLetter(text, element, delay, callback) {
+            element.innerHTML = ''; 
+            let index = 0;
+          
+            letterTimer = setInterval(() => {
+                if (index < text.length) {
+                  
+                    const letterSpan = document.createElement('span');
+                    letterSpan.className = 'letter';
+                    letterSpan.textContent = text.charAt(index);
+                    letterSpan.style.animationDelay = '0s';
+                    
+                    element.appendChild(letterSpan);
+                    index++;
+                } else {
+                    clearInterval(letterTimer); 
+                    if (callback) callback(); 
+                }
+            }, delay);
+        }
+        
+        function showNextText() {
+            // বর্তমান টেক্সট লুকানো
+            textDisplay.style.opacity = '0';
+           
+            clearInterval(letterTimer);
+            
+
+            setTimeout(() => {
+                currentTextIndex = (currentTextIndex + 1) % texts.length;
+                const nextText = texts[currentTextIndex];
+                
+                textDisplay.style.opacity = '1';
+                
+               
+                displayTextLetterByLetter(nextText, textDisplay, 800, () => {
+              
+                    if (currentTextIndex === texts.length - 1) {
+                      
+                        setTimeout(() => {
+                            buttonContainer.style.display = 'flex';
+                            animationCompleted = true;
+                        }, 2000);
+                    } else {
+                        // টেক্সট সম্পূর্ণ হওয়ার পর ২ সেকেন্ড অপেক্ষা করা
+                        textChangeTimer = setTimeout(showNextText, 2000);
+                    }
+                });
+            }, 1000);
+        }
+        
+  
+        textDisplay.style.opacity = '1';
+    
+        displayTextLetterByLetter(texts[currentTextIndex], textDisplay, 800, () => {
+           
+            textChangeTimer = setTimeout(showNextText, 1000);
+        });
+
+       
+        endButton.addEventListener('click', () => {
+           
+            alert('Thank you for watching!');
+        });
+        
+        replayButton.addEventListener('click', () => {
+            // রিপ্লে বাটনে ক্লিক করলে অ্যানিমেশন আবার শুরু হবে
+            buttonContainer.style.display = 'none';
+            currentTextIndex = 0;
+            animationCompleted = false;
+            
+           
+            textDisplay.style.opacity = '1';
+            displayTextLetterByLetter(texts[currentTextIndex], textDisplay, 800, () => {
+                textChangeTimer = setTimeout(showNextText, 5000);
+            });
+        });
+
+       
+        function animate() {
+            requestAnimationFrame(animate);
+            
+         
+            const scale = 1 + Math.sin(Date.now() * pulseSpeed) * 0.05;
+            particles.scale.set(scale, scale, scale);
+
+        
+            particles.rotation.y = Math.sin(Date.now() * swingSpeed) * swingRange;
+       
+            const textOffset = particles.rotation.y * 100; // ঘূর্ণনকে পিক্সেলে কনভার্ট
+            textDisplay.style.transform = `translate(calc(-50% + ${textOffset}px), -50%)`;
+            
+            renderer.render(scene, camera);
+        }
+      
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+       
+        animate();
+    </script>
+</body>
+</html>

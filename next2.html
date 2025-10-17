@@ -1,43 +1,550 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=
-  , initial-scale=1.0"
-    />
-    <title>wish card</title>
-    <link rel="stylesheet" href="styling.css" />
-  </head>
-  <body>
-    <div>
-      <div>
-        <div
-          class="tenor-gif-embed"
-          data-postid="2341199174677546612"
-          data-share-method="host"
-          data-aspect-ratio="1.10667"
-          data-width="100%"
-        >
-          <a
-            href="https://tenor.com/view/lain-silly-goofy-smirk-smirk-anime-gif-2341199174677546612"
-            >Lain Silly GIF</a
-          >from <a href="https://tenor.com/search/lain-gifs">Lain GIFs</a>
-        </div>
-        <script
-          type="text/javascript"
-          async
-          src="https://tenor.com/embed.js"
-        ></script>
-      </div>
-      <div>
-        <h2>
-          May your day be as sweet and special as you are—happy birthday to the
-          one who lights up my world!💕🎂
-        </h2>
-        <a class="Next" href="next3.html">Next</a>
-      </div>
-    </div>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+  <title>Happy Birthday — Firework → Letters → Balloons</title>
+  <style>
+    html,body{height:100%; margin:0; background:#020202; overflow:hidden; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Dancing Script", cursive;}
+    canvas{display:block}
+    #uiNote{
+      position: absolute;
+      left:12px;
+      bottom:12px;
+      color:#ddd;
+      font-size:13px;
+      opacity:0.9;
+      z-index:10;
+      background: rgba(255,255,255,0.02);
+      padding:8px 10px;
+      border-radius:8px;
+      backdrop-filter: blur(4px);
+    }
+    #replayBtn{
+      position:absolute;
+      right:12px;
+      bottom:12px;
+      z-index:10;
+      padding:8px 12px;
+      border-radius:8px;
+      border:none;
+      cursor:pointer;
+      background:rgba(255,255,255,0.06);
+      color:#fff;
+      font-weight:600;
+    }
+    
+    /* Next button style - initially hidden */
+    .Next {
+      display: none; /* initially hidden */
+      position: absolute;
+      left: 50%; /* center */
+      bottom: 60px; /* above Replay button */
+      transform: translateX(-50%); /* center horizontally */
+      z-index: 10;
+      padding: 12px 24px; /* larger padding for mobile */
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: rgba(255, 100, 100, 0.8);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 16px; /* larger font */
+    }
+    
+    .Next:hover {
+      background: rgba(255, 50, 50, 0.9);
+      transform: translateX(-50%) translateY(-2px); /* keep centered on hover */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Mobile device optimization */
+    @media (max-width: 768px) {
+      #uiNote {
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+      #replayBtn {
+        padding: 6px 10px;
+        font-size: 14px;
+      }
+      .Next {
+        padding: 14px 28px; /* larger padding for mobile */
+        font-size: 18px; /* larger font for mobile */
+        bottom: 56px;
+        width: 80%; /* wider on mobile */
+        max-width: 300px;
+      }
+    }
+    
+    /* Further optimization for small screens */
+    @media (max-width: 480px) {
+      .Next {
+        padding: 16px 32px;
+        font-size: 20px;
+        bottom: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="uiNote">Replay to restart animation</div>
+  <button id="replayBtn">Replay</button>
+  
+  <!-- Next button - becomes visible after animation ends -->
+  <a class="Next" href="next4.html">Next</a>
+
+<script>
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d', { alpha: true });
+let DPR = Math.max(1, window.devicePixelRatio || 1);
+
+function resize() {
+  DPR = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.floor(window.innerWidth * DPR);
+  canvas.height = Math.floor(window.innerHeight * DPR);
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* Configuration */
+const PHRASE = "HAPPY BIRTHDAY TO YOU!";
+const letters = PHRASE.split('').filter(()=>true); // include spaces and punctuation
+// Colors used in the image
+const colors = [
+  "#FF5252", "#FF4081", "#E040FB", "#7C4DFF", "#536DFE", 
+  "#448AFF", "#40C4FF", "#18FFFF", "#64FFDA", "#69F0AE",
+  "#B2FF59", "#EEFF41", "#FFFF00", "#FFD740", "#FFAB40",
+  "#FF6E40", "#FF5722", "#E91E63", "#9C27B0", "#673AB7",
+  "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4", "#009688",
+  "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107",
+  "#FF9800", "#FF5722", "#F44336"
+];
+const rocketCount = letters.length;
+const stage = { w: window.innerWidth, h: window.innerHeight };
+const centerX = () => window.innerWidth / 2;
+let time = 0;
+
+/* Assign specific colors to each letter */
+const letterColors = [];
+for (let i = 0; i < letters.length; i++) {
+  letterColors[i] = colors[i % colors.length];
+}
+
+/* Entities */
+let rockets = [];   // launching streaks
+let orbs = [];      // circles at apex (one per letter)
+let glyphs = [];    // letters moving to grid positions (become balloons later)
+let balloons = [];  // final upward-moving letters
+
+/* Timing control */
+const LAUNCH_INTERVAL = 220; // ms between each rocket launch
+const START_DELAY = 400;     // initial delay
+let launched = 0;
+let lastLaunchT = 0;
+let animationState = "launching"; // launching -> assembling -> floatup
+
+/* Prepare target positions for phrase formation */
+function computeTargets() {
+  const boxW = Math.min(window.innerWidth * 0.9, 920);
+  // break phrase into rows to mimic video: single row centered (but we'll wrap to two rows if long)
+  // We'll split into two rows: "HAPPY BIRTHDAY" and "TO YOU!" as in the image
+  let row1 = "HAPPY BIRTHDAY";
+  let row2 = "TO YOU!";
+  const fontSizeMain = Math.min(36, Math.floor(window.innerWidth / 26));
+  const targets = [];
+  // positions for row1
+  const gap = fontSizeMain * 1.3; // increased gap between letters
+  const row1Arr = row1.split('');
+  const row2Arr = row2.split('');
+  const total1 = row1Arr.length;
+  const total2 = row2Arr.length;
+  // compute start x so that rows centered
+  const startX1 = centerX() - ((total1 - 1) * gap) / 2;
+  const startX2 = centerX() - ((total2 - 1) * gap) / 2;
+  const baseY = window.innerHeight * 0.56;
+  row1Arr.forEach((ch, i) => {
+    targets.push({ char: ch, x: startX1 + i * gap, y: baseY, fontSize: fontSizeMain });
+  });
+  row2Arr.forEach((ch, i) => {
+    targets.push({ char: ch, x: startX2 + i * gap, y: baseY + fontSizeMain * 1.2, fontSize: fontSizeMain }); // increased gap between lines
+  });
+  // For any extra characters (if rocketCount > targets.length), place them distributed below
+  return targets;
+}
+
+let targets = computeTargets();
+
+/* Utility functions */
+function rand(min, max) { return Math.random() * (max - min) + min; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* Rocket class: colored streak rising up */
+class Rocket {
+  constructor(letterIndex) {
+    this.idx = letterIndex;
+    this.color = letterColors[letterIndex]; // use specific color
+    this.x = rand(window.innerWidth * 0.12, window.innerWidth * 0.88);
+    this.y = window.innerHeight + rand(10, 80);
+    this.vx = rand(-0.8, 0.8);
+    this.vy = -rand(5.4, 8.2);
+    this.trail = []; // last positions
+    this.targetY = rand(window.innerHeight * 0.18, window.innerHeight * 0.42);
+    this.alive = true;
+    this.age = 0;
+    this.width = rand(2,5);
+  }
+  update(dt) {
+    this.age += dt;
+    // physics
+    this.vy += 0.02; // slight gravity upward reduces
+    this.x += this.vx;
+    this.y += this.vy;
+    // push trail
+    this.trail.push({x:this.x, y:this.y});
+    if(this.trail.length>18) this.trail.shift();
+    if(this.y <= this.targetY || this.age > 5000) {
+      this.alive = false;
+      // spawn orb at this.x,y with same color and assigned letter index
+      orbs.push(new Orb(this.x, this.y, this.color, this.idx));
+    }
+  }
+  draw(ctx) {
+    // draw streak gradient line
+    ctx.save();
+    ctx.lineCap = 'round';
+    const g = ctx.createLinearGradient(this.x, this.y, this.x, this.y+60);
+    g.addColorStop(0, this.color);
+    g.addColorStop(1, 'rgba(255,255,255,0.06)');
+    ctx.strokeStyle = g;
+    ctx.lineWidth = this.width;
+    ctx.beginPath();
+    for(let i=0;i<this.trail.length;i++){
+      const p = this.trail[i];
+      if(i===0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke();
+    // small tip glow
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = 0.9;
+    ctx.arc(this.x, this.y, 3.6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+/* Orb class: expands into circle then releases letter */
+class Orb {
+  constructor(x,y,color,letterIndex) {
+    this.x = x; this.y = y;
+    this.color = color;
+    this.r = 2; this.maxR = rand(12,24);
+    this.growing = true;
+    this.age = 0;
+    this.letterIndex = letterIndex;
+    this.phase = 0; // 0 growing,1 settled,2 releasing letter
+    this.settleT = rand(260, 620); // ms to hold settled
+    this.released = false;
+  }
+  update(dt) {
+    this.age += dt;
+    if(this.growing){
+      this.r += dt * 0.04 * (this.maxR/12);
+      if(this.r >= this.maxR) {
+        this.r = this.maxR;
+        this.growing = false;
+        this.phase = 1;
+        this.age = 0;
+      }
+    } else if(this.phase === 1) {
+      if(this.age >= this.settleT){
+        this.phase = 2;
+        // spawn glyph (letter) at orb position with slight jitter velocity
+        const ch = letters[this.letterIndex] || ' ';
+        glyphs.push(new Glyph(this.x, this.y, ch, this.color, this.letterIndex));
+        this.released = true;
+      }
+    }
+  }
+  draw(ctx) {
+    ctx.save();
+    // soft glow
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = 0.08;
+    ctx.arc(this.x, this.y, this.r*3.8, 0, Math.PI*2);
+    ctx.fill();
+    // main orb
+    ctx.globalAlpha = 1.0;
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+/* Glyph: letter leaving orb, moves to target formation pos */
+class Glyph {
+  constructor(x,y,char,color,index) {
+    this.x = x; this.y = y;
+    this.char = char;
+    this.color = color;
+    this.index = index;
+    this.r = 10;
+    this.vx = rand(-1,1);
+    this.vy = rand(-1.2, -0.2);
+    this.alpha = 1;
+    this.state = "toTarget"; // toTarget -> settled -> balloonize
+    // compute assigned target: if char is space, target will be hidden
+    this.target = findTargetForIndex(index, char);
+    this.settledAt = 0;
+  }
+  update(dt) {
+    if(this.state === "toTarget"){
+      // simple easing towards target
+      if(!this.target) {
+        // if no visible target (e.g., extra indices), fade out
+        this.alpha -= dt * 0.0018;
+        if(this.alpha <= 0) this.alpha = 0;
+        return;
+      }
+      // approach with easing
+      const dx = this.target.x - this.x;
+      const dy = this.target.y - this.y;
+      this.vx = dx * 0.02;
+      this.vy = dy * 0.02 - 0.3 * Math.sin(time*0.003 + this.index);
+      this.x += this.vx * dt * 0.06;
+      this.y += this.vy * dt * 0.06;
+      // slow down near target
+      const dist = Math.hypot(dx, dy);
+      if(dist < 6) {
+        this.state = "settled";
+        this.settledAt = time;
+        // small bounce
+        this.r = 12;
+      }
+    } else if(this.state === "settled"){
+      // slight float
+      this.y += Math.sin((time + this.index*70)/400) * 0.02;
+    } else if(this.state === "balloon"){
+      // balloons float upward with string drawn below
+      this.y -= 0.04 * dt;
+      this.x += Math.sin((time + this.index*200)/400) * 0.02;
+    }
+  }
+  draw(ctx) {
+    if(this.char === ' ') return; // don't draw spaces
+    ctx.save();
+    const drawR = Math.max(6, this.r);
+    
+    if (this.state === 'balloon') {
+      // Draw colored circle in balloon state
+      ctx.beginPath();
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = this.alpha;
+      ctx.arc(this.x, this.y, drawR, 0, Math.PI*2);
+      ctx.fill();
+      
+      // Draw balloon string
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y + drawR - 2);
+      ctx.quadraticCurveTo(
+        this.x + 6, 
+        this.y + drawR + 24, 
+        this.x + rand(-6,6), 
+        this.y + drawR + 44
+      );
+      ctx.stroke();
+      
+      // Draw white letter on balloon
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `${Math.round(drawR*1.05)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(this.char, this.x, this.y + (this.char === '!' ? -1 : 0));
+    } else {
+      // Draw colored letter in static state (like in the image)
+      ctx.fillStyle = this.color;
+      ctx.font = `bold ${Math.round(drawR*1.8)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.globalAlpha = this.alpha;
+      ctx.fillText(this.char, this.x, this.y + (this.char === '!' ? -1 : 0));
+    }
+    
+    ctx.restore();
+  }
+}
+
+/* Helper: map rocket index to target (we assign sequentially to phrase characters order) */
+function findTargetForIndex(index, char) {
+  // We will assign the first row1 + row2 targets in order; spaces still have targets but glyphs won't draw.
+  if(!targets || targets.length === 0) return null;
+  // We map by counting letters produced so far in same order as rockets were launched.
+  // Since rockets indices correspond to original letters array indices, we need mapping from that index to a target element.
+  // We'll map indices 0..targetCount-1 to targets, others null.
+  if(index < targets.length) {
+    return { x: targets[index].x, y: targets[index].y, fontSize: targets[index].fontSize || 30 };
+  }
+  return null;
+}
+
+/* Launch control */
+function launchNext() {
+  if(launched >= rocketCount) return;
+  rockets.push(new Rocket(launched));
+  launched++;
+}
+
+/* Animation loop */
+let lastTime = performance.now();
+function loop(now) {
+  const dt = now - lastTime;
+  lastTime = now;
+  time += dt;
+  // clear with subtle fade to leave tiny trails
+  ctx.fillStyle = 'rgba(1,2,2,0.14)';
+  ctx.fillRect(0,0,canvas.width/DPR, canvas.height/DPR);
+
+  // launch rockets at interval
+  if(animationState === "launching") {
+    if(time - lastLaunchT > LAUNCH_INTERVAL) {
+      lastLaunchT = time;
+      launchNext();
+    }
+    // when all launched and none left active and orbs/glyphs handling, move to assembling
+    if(launched === rocketCount && rockets.length === 0 && orbs.length === 0 && glyphs.length > 0) {
+      animationState = "assembling";
+      // give each glyph a slight delay to settle into "settled" state
+    }
+  }
+
+  // update & draw rockets
+  for(let i=rockets.length-1;i>=0;i--){
+    const r = rockets[i];
+    r.update(dt);
+    r.draw(ctx);
+    if(!r.alive) rockets.splice(i,1);
+  }
+
+  // update & draw orbs
+  for(let i=orbs.length-1;i>=0;i--){
+    const o = orbs[i];
+    o.update(dt);
+    o.draw(ctx);
+    if(o.released) {
+      // if orb released its glyph, remove orb gradually
+      o.r -= dt * 0.012;
+      if(o.r <= 0.6) orbs.splice(i,1);
+    }
+  }
+
+  // update & draw glyphs
+  for(let i=glyphs.length-1;i>=0;i--){
+    const g = glyphs[i];
+    g.update(dt);
+    g.draw(ctx);
+    // if all glyphs reached settled -> after a pause convert to balloon
+  }
+
+  // check assembled condition: if majority glyphs are settled
+  if(animationState === "assembling") {
+    const settledCount = glyphs.filter(g => g.state === 'settled' || g.state === 'balloon').length;
+    if(settledCount >= targets.length) {
+      // after short pause, balloonize letters one by one
+      setTimeout(() => {
+        balloonizeSequential();
+      }, 700);
+      animationState = "waitingBalloon";
+    }
+  }
+
+  // draw some tiny spark particles to mimic video (random tiny dots)
+  drawSparks(now);
+
+  requestAnimationFrame(loop);
+}
+
+/* Sparks background */
+let lastSpark = 0;
+function drawSparks(now) {
+  if(now - lastSpark > 80) {
+    lastSpark = now;
+    // spawn few faint dots near center
+    for(let i=0;i<3;i++){
+      const x = rand(window.innerWidth*0.25, window.innerWidth*0.75);
+      const y = rand(window.innerHeight*0.25, window.innerHeight*0.6);
+      ctx.beginPath();
+      ctx.fillStyle = pick(colors);
+      ctx.globalAlpha = 0.06 + Math.random()*0.14;
+      ctx.arc(x + rand(-10,10), y + rand(-6,6), rand(2,6), 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+/* After assembled, turn glyphs into balloon state sequentially */
+function balloonizeSequential() {
+  // order: left-to-right top row then next row
+  // We'll sort glyphs by target.x asc then set state 'balloon' with delay
+  const activeGlyphs = glyphs.filter(g => g.char !== ' ');
+  activeGlyphs.sort((a,b) => {
+    const ta = a.target ? a.target.x : a.x;
+    const tb = b.target ? b.target.x : b.x;
+    return ta - tb;
+  });
+  activeGlyphs.forEach((g, i) => {
+    setTimeout(() => {
+      g.state = 'balloon';
+      // enlarge a bit
+      g.r = 14;
+    }, i * 180 + 250);
+  });
+  // after all balloonized, set animationState
+  setTimeout(() => {
+    animationState = "floatup";
+    // Show Next button when animation ends
+    document.querySelector('.Next').style.display = 'block';
+  }, activeGlyphs.length * 180 + 400);
+}
+
+/* Replay */
+document.getElementById('replayBtn').addEventListener('click', restart);
+
+/* restart function */
+function restart() {
+  rockets = []; orbs = []; glyphs = []; balloons = [];
+  launched = 0; lastLaunchT = time;
+  animationState = "launching";
+  // clear canvas fully
+  ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
+  // re-compute targets (resize may have changed)
+  targets = computeTargets();
+  
+  // Hide Next button when restarting
+  document.querySelector('.Next').style.display = 'none';
+}
+
+
+restart();
+requestAnimationFrame(loop);
+
+
+
+</script>
+</body>
 </html>
